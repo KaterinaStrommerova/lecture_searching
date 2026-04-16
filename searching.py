@@ -13,18 +13,26 @@ def read_data(file_name, field):
 
     Returns:
         list | str | None:
-            - list: If data retrieved by the selected field contains numeric data.
-            - str: If field is 'dna_sequence'.
-            - None: If the field is not supported.
     """
     # get current working directory path
     cwd_path = Path.cwd()
-    
     file_path = cwd_path / file_name
+
+    # otevření a načtení JSON
+    with open(file_path, "r", encoding="utf-8") as file:
+        data = json.load(file)
+
+    # kontrola povolených polí
+    if field not in ["unordered_numbers", "ordered_numbers", "dna_sequence"]:
+        return None
+
+    # vrácení hodnoty
+    return data.get(field, None)
 
 
 def main():
-    pass
+    print(read_data("sequential.json", "unordered_numbers"))
+    print(read_data("sequential.json", "dna_sequence"))
 
 
 if __name__ == "__main__":
