@@ -3,36 +3,52 @@ import json
 
 
 def read_data(file_name, field):
-    """
-    Reads a JSON file and returns data for a given field.
 
-    Args:
-        file_name (str): Name of the JSON file.
-        field (str): Key to retrieve from the JSON data.
-            Must be one of: 'unordered_numbers', 'ordered_numbers' or 'dna_sequence'.
+    allowed_fields = ["unordered_numbers", "ordered_numbers", "dna_sequence"]
 
-    Returns:
-        list | str | None:
-    """
-    # get current working directory path
-    cwd_path = Path.cwd()
-    file_path = cwd_path / file_name
 
-    # otevření a načtení JSON
+    if field not in allowed_fields:
+        return None
+
+
+    file_path = Path.cwd() / file_name
+
+
     with open(file_path, "r", encoding="utf-8") as file:
         data = json.load(file)
 
-    # kontrola povolených polí
-    if field not in ["unordered_numbers", "ordered_numbers", "dna_sequence"]:
-        return None
 
-    # vrácení hodnoty
     return data.get(field, None)
 
 
+def linear_search(sequence, target):
+    positions = []
+
+    for idx, value in enumerate(sequence):
+        if value == target:
+            positions.append(idx)
+
+    return {
+        "positions": positions,
+        "count": len(positions)
+    }
+
+
 def main():
-    print(read_data("sequential.json", "unordered_numbers"))
-    print(read_data("sequential.json", "dna_sequence"))
+
+    sequential_data = read_data("sequential.json", "unordered_numbers")
+    print("Data:", sequential_data)
+
+
+    if sequential_data is None:
+        print("Chyba, data nejsou k dispozici.")
+        return
+
+    target_number = 5
+
+    result = linear_search(sequential_data, target_number)
+
+    print("Výsledek hledání:", result)
 
 
 if __name__ == "__main__":
