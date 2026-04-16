@@ -1,6 +1,8 @@
+import time
+import matplotlib.pyplot as plt
+from generators import unordered_sequence, ordered_sequence
 from pathlib import Path
 import json
-
 
 def read_data(file_name, field):
 
@@ -50,9 +52,22 @@ def binary_search(prohledavany_seznam_cisel, hledane_cislo_02):
 
     return None
 
+def measure_time(func, *args, repeat=5):
+    times = []
+
+    for _ in range(repeat):
+        start = time.perf_counter()
+        func(*args)
+        end = time.perf_counter()
+        times.append(end - start)
+
+    return sum(times) / len(times)
 
 def main():
 
+    # -------------------------
+    # 1) základní testy
+    # -------------------------
     sequential_data = read_data("sequential.json", "unordered_numbers")
     print("Unordered data:", sequential_data)
 
@@ -62,13 +77,57 @@ def main():
 
     print("-" * 40)
 
-
     ordered_data = read_data("sequential.json", "ordered_numbers")
     print("Ordered data:", ordered_data)
 
     binary_result = binary_search(ordered_data, hledane_cislo_number)
     print("Binary search index:", binary_result)
 
+
+    # -------------------------
+    # 2) měření výkonu
+    # -------------------------
+    sizes = [100, 500, 1000, 5000, 10000]
+
+    linear_times = []
+    binary_times = []
+    set_times = []
+
+    target = 36
+
+    for size in sizes:
+        unordered = unordered_sequence(size)
+        ordered = ordered_sequence(size)
+        data_set = set(unordered)
+
+        linear_t = measure_time(linear_search, unordered, target)
+        binary_t = measure_time(binary_search, ordered, target)
+        set_t = measure_time(lambda s, t: t in s, data_set, target)
+
+        linear_times.append(linear_t)
+        binary_times.append(binary_t)
+        set_times.append(set_t)
+
+    # -------------------------
+    # 3) graf (JEN JEDNOU!)
+    # -------------------------
+    print(len(sizes), len(linear_times), len(binary_times), len(set_times))
+
+    plt.figure(figsize=(10, 6))
+
+    plt.plot(sizes, linear_times, marker="o", label="Linear search")
+    plt.plot(sizes, binary_times, marker="o", label="Binary search")
+    plt.plot(sizes, set_times, marker="o", label="Set membership")
+
+    plt.xlabel("Velikost vstupu")
+    plt.ylabel("Čas (s)")
+    plt.title("Porovnání algoritmů")
+
+    plt.legend()
+    plt.grid()
+    plt.yscale("log")
+
+    plt.show()
 
 if __name__ == "__main__":
     main()
