@@ -63,15 +63,28 @@ def measure_time(func, *args, repeat=5):
 
     return sum(times) / len(times)
 
+def pattern_search(prohledavana_sekvence, hledany_vzor):
+
+    positions = set()
+    idx = 0
+
+    while True:
+        idx = prohledavana_sekvence.find(hledany_vzor, idx)
+
+        if idx == -1:
+            break
+
+        positions.add(idx)
+        idx += 1
+
+    return positions
+
 def main():
 
-    # -------------------------
-    # 1) základní testy
-    # -------------------------
     sequential_data = read_data("sequential.json", "unordered_numbers")
     print("Unordered data:", sequential_data)
 
-    hledane_cislo_number = 5
+    hledane_cislo_number = 8
     linear_result = linear_search(sequential_data, hledane_cislo_number)
     print("Linear search:", linear_result)
 
@@ -83,17 +96,13 @@ def main():
     binary_result = binary_search(ordered_data, hledane_cislo_number)
     print("Binary search index:", binary_result)
 
-
-    # -------------------------
-    # 2) měření výkonu
-    # -------------------------
     sizes = [100, 500, 1000, 5000, 10000]
 
     linear_times = []
     binary_times = []
     set_times = []
 
-    target = 36
+    target = 98
 
     for size in sizes:
         unordered = unordered_sequence(size)
@@ -108,9 +117,6 @@ def main():
         binary_times.append(binary_t)
         set_times.append(set_t)
 
-    # -------------------------
-    # 3) graf (JEN JEDNOU!)
-    # -------------------------
     print(len(sizes), len(linear_times), len(binary_times), len(set_times))
 
     plt.figure(figsize=(10, 6))
@@ -128,6 +134,15 @@ def main():
     plt.yscale("log")
 
     plt.show()
+
+    dna_sekvence = read_data("sequential.json", "dna_sequence")
+    print("DNA sekvence:", dna_sekvence)
+
+    hledany_vzor = "ATA"
+
+    pozice_vyskytu = pattern_search(dna_sekvence, hledany_vzor)
+
+    print("Pozice výskytu vzoru:", pozice_vyskytu)
 
 if __name__ == "__main__":
     main()
